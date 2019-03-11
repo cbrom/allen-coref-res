@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+message Input {
+	string document = 1;
+}
+
+message IndexPair {
+	int32 indexStart = 2;
+	int32 indexEnd = 3;
+}
+
+message TopSpans {
+	repeated IndexPair topSpan = 4;
+}
+
+message PredictedAntecedents {
+	repeated int32 predicted = 5;
+}
+
+message TokenizedDocument {
+	repeated string documentTokens = 6;
+}
+
+message Coref {
+	repeated IndexPair corefs = 7;
+}
+
+message Cluster {
+	repeated Coref clusters = 8;
+}
+
+message Output{
+	TopSpans = 1;
+	PredictedAntecedents = 2;
+	TokenizedDocument = 3;
+	Cluster clusters = 4;
+}
+
+service CorefResolution {
+	rpc infer (Input) returns (Output){}
+}

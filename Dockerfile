@@ -31,11 +31,11 @@ WORKDIR /coref_res
 
 RUN chmod +x install.sh && ./install.sh
 
-EXPOSE 8003
-EXPOSE 8004
+
+EXPOSE 50051
 
 RUN mkdir -p /root/.allennlp/models/ && wget "https://s3-us-west-2.amazonaws.com/allennlp/models/coref-model-2018.02.05.tar.gz" -O /root/.allennlp/models/coref-model-2018.02.05.tar.gz
 
 RUN python3.6 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. Service/coref.proto
 
-CMD ["python3.6", "run-snet-service.py","--daemon-config-path-mainnet","snet.config.example.mainnet.json","--daemon-config-path-ropsten","snet.config.example.ropsten.json"]
+CMD ["python3.6", "start_service.py"]

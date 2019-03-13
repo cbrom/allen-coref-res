@@ -5,35 +5,27 @@ message Input {
 }
 
 message IndexPair {
-	int32 index_start = 2;
-	int32 index_end = 3;
+	int32 start = 2;
+	int32 end = 3;
 }
 
 message TopSpans {
-	repeated IndexPair top_span_pair = 4;
-}
-
-message PredictedAntecedents {
-	repeated int32 predicted = 5;
+	repeated IndexPair pairs = 4;
 }
 
 message TokenizedDocument {
 	repeated string document_token = 6;
 }
 
-message Coref {
-	repeated IndexPair corefs_pair = 7;
-}
-
 message Cluster {
-	repeated Coref corefs = 8;
+	repeated IndexPair pairs = 7;
 }
 
 message Output{
 	TopSpans top_spans= 1;
-	PredictedAntecedents predicted_antecedents= 2;
-	TokenizedDocument document= 3;
-	Cluster clusters = 4;
+	repeated int32 predicted_antecedents= 2;
+	repeated string document= 3;
+	repeated Cluster clusters = 4;
 }
 
 service CorefResolution {

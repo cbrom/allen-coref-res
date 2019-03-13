@@ -2,6 +2,7 @@ from allennlp .predictors.predictor import Predictor
 
 class CoreferenceResolver:
 	predictor = Predictor.from_path("/root/.allennlp/models/coref-model-2018.02.05.tar.gz")
+	# predictor = Predictor.from_path("./models/coref-model-2018.02.05.tar.gz")
 
 	def coref_resolution(document):
 		return CoreferenceResolver.predictor.predict(document)

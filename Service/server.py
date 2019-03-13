@@ -8,7 +8,7 @@ import coref_pb2_grpc
 import coref_res_allen
 
 
-class CorefResolvServicer(coref_pb2_grpc.CorefResolvServicer):
+class CorefResolvServicer(coref_pb2_grpc.CorefResolutionServicer):
     def resolve(self, request, context):
         if request.document is None:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -25,38 +25,33 @@ class CorefResolvServicer(coref_pb2_grpc.CorefResolvServicer):
         result = coref_res_allen.CoreferenceResolver.coref_resolution(request.document)
 
         # top_spans
-        top_span = response.top_spans.add()
+        top_spans_list = []
         for s, e in result['top_spans']:
-            top_span_index = top_span.top_span_pair.add()
-            top_span_index.index_start = s
-            top_span_index.index_end = e
+            pair = coref_pb2.IndexPair(start=s, end=e)
+            top_spans_list.append(pair)
+        
+        clusters_list = []
+        for clusters_res in result['clusters']:
+            cluster_list = []
+            for s, e in clusters_res:
+                pair = coref_pb2.IndexPair(start=s, end=e)
+                cluster_list.append(pair)
+            cluster = coref_pb2.Cluster(pairs=cluster_list)
+            clusters_list.append(cluster)
 
-        # predicted_antecedents
-        predicted_antecedent = response.predicted_antecedents.add()
-        for val in result['predicted_antecedents']:
-            predicted_antecedent.predicted = val
+        top_spans = coref_pb2.TopSpans(pairs=top_spans_list)
 
-        # document
-        document = response.document.add()
-        for val in result['document']:
-            document.document_token = val
-
-        # clusters
-        cluster = response.cluster.add()
-        for cluster_res in result['clusters']:
-            coref = cluster.corefs.add()
-            for s, e in cluster_res:
-                coref_pair = coref.corefs_pair.add()
-                coref_pair.index_start = s
-                coref_pair.index_end = e
-
+        response = coref_pb2.Output(
+            top_spans = top_spans, predicted_antecedents = result['predicted_antecedents'], 
+            document = result['document'], clusters = clusters_list
+        )
 
         return response
 
 def start_server(port="50051"):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    coref_pb2_grpc.add_CorefResolvServicer_to_server(CorefResolvServicer(), server)
-    server.add_insecure_port('[::]' + str(port))
+    coref_pb2_grpc.add_CorefResolutionServicer_to_server(CorefResolvServicer(), server)
+    server.add_insecure_port('localhost:' + str(port))
     return server
 
 if __name__ == '__main__':

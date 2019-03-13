@@ -25,33 +25,26 @@ class CorefResolvServicer(coref_pb2_grpc.CorefResolutionServicer):
         result = coref_res_allen.CoreferenceResolver.coref_resolution(request.document)
 
         # top_spans
-        top_span = response.top_spans
+        top_spans_list = []
         for s, e in result['top_spans']:
-            top_span_index = top_span.top_span_pair.add()
-            top_span_index.index_start = s
-            top_span_index.index_end = e
+            pair = coref_pb2.IndexPair(s=s, e=e)
+            top_spans_list.append(pair)
+        
+        clusters_list = []
+        for clusters_res in result['clusters']:
+            cluster_list = []
+            for s, e in clusters_res:
+                pair = coref_pb2.IndexPair(s=s, e=e)
+                cluster_list.append(pair)
+            cluster = coref_pb2.Cluster(pairs=cluster_list)
+            clusters_list.append(cluster)
 
-        # predicted_antecedents
-        predicted_antecedent = response.predicted_antecedents
-        for val in result['predicted_antecedents']:
-            repInt = predicted_antecedent.predicted.add()
-            repInt.value = val
+        top_spans = coref_pb2.TopSpans(pairs=top_spans_list)
 
-        # document
-        document = response.document
-        for val in result['document']:
-            repStr = document.document_token.add()
-            repStr.value = val
-
-        # clusters
-        cluster = response.clusters
-        for cluster_res in result['clusters']:
-            coref = cluster.corefs.add()
-            for s, e in cluster_res:
-                coref_pair = coref.corefs_pair.add()
-                coref_pair.index_start = s
-                coref_pair.index_end = e
-
+        response = coref_pb2.Output(
+            top_spans = top_spans, predicted_antecedents = result['predicted_antecedents'], 
+            document = result['document'], clusters = clusters_list
+        )
 
         return response
 

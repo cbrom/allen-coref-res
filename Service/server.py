@@ -27,14 +27,14 @@ class CorefResolvServicer(coref_pb2_grpc.CorefResolutionServicer):
         # top_spans
         top_spans_list = []
         for s, e in result['top_spans']:
-            pair = coref_pb2.IndexPair(s=s, e=e)
+            pair = coref_pb2.IndexPair(start=s, end=e)
             top_spans_list.append(pair)
         
         clusters_list = []
         for clusters_res in result['clusters']:
             cluster_list = []
             for s, e in clusters_res:
-                pair = coref_pb2.IndexPair(s=s, e=e)
+                pair = coref_pb2.IndexPair(start=s, end=e)
                 cluster_list.append(pair)
             cluster = coref_pb2.Cluster(pairs=cluster_list)
             clusters_list.append(cluster)

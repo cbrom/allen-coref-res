@@ -5,12 +5,12 @@ message Input {
 }
 
 message IndexPair {
-	int32 indexStart = 2;
-	int32 indexEnd = 3;
+	int32 index_start = 2;
+	int32 index_end = 3;
 }
 
 message TopSpans {
-	repeated IndexPair topSpan = 4;
+	repeated IndexPair top_span_pair = 4;
 }
 
 message PredictedAntecedents {
@@ -18,24 +18,24 @@ message PredictedAntecedents {
 }
 
 message TokenizedDocument {
-	repeated string documentTokens = 6;
+	repeated string document_token = 6;
 }
 
 message Coref {
-	repeated IndexPair corefs = 7;
+	repeated IndexPair corefs_pair = 7;
 }
 
 message Cluster {
-	repeated Coref clusters = 8;
+	repeated Coref corefs = 8;
 }
 
 message Output{
-	TopSpans = 1;
-	PredictedAntecedents = 2;
-	TokenizedDocument = 3;
+	TopSpans top_spans= 1;
+	PredictedAntecedents predicted_antecedents= 2;
+	TokenizedDocument document= 3;
 	Cluster clusters = 4;
 }
 
 service CorefResolution {
-	rpc infer (Input) returns (Output){}
+	rpc resolve (Input) returns (Output){}
 }
